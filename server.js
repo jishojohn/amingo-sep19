@@ -20,7 +20,6 @@ const postRoutes = require('./routes/Post');
 app.use('/posts', postRoutes);
 
 const port = process.env.PORT || 5000
-
 app.get('/', (req, res) => res.json({messsage: "Hello Amigo!!˜"}))
 
 app.listen(port, () => console.log(`Your application is running @ http://localhost:${port}`))
