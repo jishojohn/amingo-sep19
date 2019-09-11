@@ -1,5 +1,6 @@
-const express = require('express')
-const Post = require('../models/Post')
+const express = require('express');
+const Post = require('../models/Post');
+const User = require('../models/User');
 
 const router = express.Router();
 
@@ -11,16 +12,28 @@ const router = express.Router();
  * @param {string} email - email of the user
  * @param {string} message - the message
  */
-router.post('/', (req, res) =>{
-    const newPost = new Post({
-        email: req.body.email,
-        message: req.body.message
-    })
-
-    newPost
-        .save()
-        .then(post => res.json(post))
-        .catch(err => res.json(err))
+router.post('/', (req, res) => {
+    console.log('req.body.email->', req.body.email);
+    User
+        .findOne({email: req.body.email})
+        .then(user => {
+            if (user) {
+                console.log("user->", user);
+                const newPost = new Post({
+                    email: req.body.email,
+                    message: req.body.message,
+                    userId: user._id
+                });
+            
+                newPost
+                    .save()
+                    .then(post => res.json(post))
+                    .catch(err => res.json(err))
+            } else {
+                res.json({message: "User is not found"});
+            }
+        })
+        .catch(err => res.json({message: err}))
 });
 
 /**
@@ -31,6 +44,13 @@ router.post('/', (req, res) =>{
 router.get('/', (req, res) => {
     Post
         .find()
+        .then(posts => res.json(posts))
+        .catch(err => res.json(err))
+});
+
+router.get('/getByEmail', (req, res) => {
+    Post
+        .find({email: req.query.email})
         .then(posts => res.json(posts))
         .catch(err => res.json(err))
 });

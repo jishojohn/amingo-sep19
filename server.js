@@ -4,7 +4,7 @@ const bodyParser = require('body-parser');
 
 const db = "mongodb+srv://astrolabs:makeithappen@cluster0-4h9ap.mongodb.net/test?retryWrites=true&w=majority"
 mongoose
-    .connect(db, {useNewUrlParser:true })
+    .connect(db, {useNewUrlParser:true, useUnifiedTopology: true })
     .then(() => console.log("DB Is connected"))
     .catch(err => console.log(err))
 
