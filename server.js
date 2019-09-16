@@ -1,8 +1,10 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const keys = require('./config/keys')
 
-const db = "mongodb+srv://astrolabs:makeithappen@cluster0-4h9ap.mongodb.net/test?retryWrites=true&w=majority"
+const db = keys.mongoURI;
+
 mongoose
     .connect(db, {useNewUrlParser:true, useUnifiedTopology: true })
     .then(() => console.log("DB Is connected"))
