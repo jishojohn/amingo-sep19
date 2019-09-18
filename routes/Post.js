@@ -24,6 +24,41 @@ router.post('/', (req, res) =>{
 })
 
 /**
+ * Put route to update a post
+ * 
+ * @name PUT /posts
+ * 
+ * @param {string} message - new message
+ */
+router.put('/:id', (req, res) =>{
+    Post
+        .findById(req.params.id)
+        .then(post => {
+            console.log("Post found", post);
+            post.message = req.body.message
+                post.save().then(updatedPost => { 
+                    res.json(updatedPost)})
+        })
+});
+
+/**
+ * Delete route to delete a post
+ * 
+ * @name PUT /posts
+ * 
+ * @param {string} id - id of the post
+ */
+router.delete('/', (req, res) =>{
+    Post
+        .findById(req.query.id)
+        .then(post => {
+            console.log("Post found", post);
+            post.remove().then(res.json({"message": "Message is deleted"}))
+        })
+});
+
+
+/**
  * Get route to fetch all the post of logged in user from Posts collection
  * 
  * @name GET /post
