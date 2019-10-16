@@ -1,6 +1,5 @@
 const express = require('express');
-const Post = require('../models/Post');
-const User = require('../models/User');
+const PostModel = require('../models/Post');
 
 const router = express.Router();
 
@@ -11,7 +10,7 @@ const router = express.Router();
  * 
  * @param {string} message - message of the user
  */
-router.post('/', (req, res) =>{
+router.post('/', (req, res) => {
     const newPost = new Post({
         message: req.body.message,
         user: req.user
@@ -19,7 +18,7 @@ router.post('/', (req, res) =>{
 
     newPost
         .save()
-        .then(post=> res.json(post))
+        .then(post => res.json(post))
         .catch(err => res.json(err))
 })
 
@@ -30,14 +29,15 @@ router.post('/', (req, res) =>{
  * 
  * @param {string} message - new message
  */
-router.put('/:id', (req, res) =>{
-    Post
+router.put('/:id', (req, res) => {
+    PostModel
         .findById(req.params.id)
         .then(post => {
             console.log("Post found", post);
             post.message = req.body.message
-                post.save().then(updatedPost => { 
-                    res.json(updatedPost)})
+            post.save().then(updatedPost => {
+                res.json(updatedPost)
+            })
         })
 });
 
@@ -48,12 +48,12 @@ router.put('/:id', (req, res) =>{
  * 
  * @param {string} id - id of the post
  */
-router.delete('/', (req, res) =>{
-    Post
+router.delete('/', (req, res) => {
+    PostModel
         .findById(req.query.id)
         .then(post => {
             console.log("Post found", post);
-            post.remove().then(res.json({"message": "Message is deleted"}))
+            post.remove().then(res.json({ "message": "Message is deleted" }))
         })
 });
 
@@ -64,15 +64,15 @@ router.delete('/', (req, res) =>{
  * @name GET /post
  */
 router.get('/', (req, res) => {
-    Post
-        .find({user: req.user})
+    PostModel
+        .find({ user: req.user })
         .then(posts => res.json(posts))
         .catch(err => res.json(err))
 });
 
 router.get('/getByEmail', (req, res) => {
-    Post
-        .find({email: req.query.email})
+    PostModel
+        .find({ email: req.query.email })
         .then(posts => res.json(posts))
         .catch(err => res.json(err))
 });

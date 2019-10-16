@@ -17,31 +17,33 @@ const router = express.Router();
  * @param {occupation} occupation - occupation of the user
  */
 router.post('/register', (req, res) => {
-    User.findOne({email: req.body.email})
-        .then( user => {
+  User.findOne({ email: req.body.email })
+    .then(user => {
 
-            if (user) {
-                //Return error message
-                res.json({message: "Invalid user"})
-            } else {
-                //Save new user
-                const newUser = new User({
-                    name: req.body.name,
-                    email: req.body.email,
-                    password: req.body.password,
-                    occupation: req.body.occupation
-                })
-                bcrypt.genSalt((err, salt) => {
-                    bcrypt.hash(newUser.password, salt, (err, hash) => {
-                        newUser.password = hash;
-                        newUser
-                            .save()
-                            .then(user => res.json(user))
-                            .catch(err => console.log(err));
-                    });
-                });
-            }
+      if (user) {
+        //Return error message
+        res.status(400).json({ message: "A user with account exists" })
+      } else {
+        //Save new user
+        const newUser = new User({
+          name: req.body.name,
+          email: req.body.email,
+          password: req.body.password,
+          occupation: req.body.occupation
         })
+        bcrypt.genSalt((err, salt) => {
+          bcrypt.hash(newUser.password, salt, (err, hash) => {
+            newUser.password = hash;
+            newUser
+              .save()
+              .then(user => res.status(209).json(user))
+              .catch(err => res.json({
+                message: err
+              }));
+          });
+        });
+      }
+    })
 });
 
 /**
@@ -53,42 +55,42 @@ router.post('/register', (req, res) => {
  * @param {string} password - password of the user
  */
 router.post('/login', (req, res) => {
-    const email = req.body.email;
-    const password = req.body.password;
+  const email = req.body.email;
+  const password = req.body.password;
 
-    User.findOne({email: email}).then(user => {
-        
-        if (user) {
-            
-            bcrypt.compare(password, user.password).then(isMatch => {
-                if (isMatch) {
+  User.findOne({ email: email }).then(user => {
 
-                    const payload = { id: user.id, name: user.name, email: user.email };
+    if (user) {
 
-                    // Sign Token
-                    jwt.sign(
-                        payload,
-                        keys.secret,
-                        (err, token) => {
-                            res.json({
-                                success: true,
-                                token: token,
-                                name: user.name
-                            });
-                        }
-                    );
+      bcrypt.compare(password, user.password).then(isMatch => {
+        if (isMatch) {
 
-                } else {
-                    res.status(400).json({message: "Wrong password entered!!"})
-                }
-            });
+          const payload = { id: user.id, name: user.name, email: user.email };
+
+          // Sign Token
+          jwt.sign(
+            payload,
+            keys.secret,
+            (err, token) => {
+              res.json({
+                success: true,
+                token: token,
+                name: user.name,
+              });
+            }
+          );
 
         } else {
-            res.status(400).json({message: "User not found"});
+          res.status(400).json({ message: "Wrong password entered!!" })
         }
-    }).catch( err=> {
-        res.status(400).json({message: "User not found"});
-    })
+      });
+
+    } else {
+      res.status(400).json({ message: "User not found" });
+    }
+  }).catch(err => {
+    res.status(400).json({ message: "User not found" });
+  })
 });
 
 
